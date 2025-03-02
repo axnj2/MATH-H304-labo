@@ -51,12 +51,8 @@ out;
 out.yout.plot
 simulated_output_time = out.yout.get("simu_output").Values.Time;
 simulated_output_data = out.yout.get("simu_output").Values.Data;
-simulated_output_data = simulated_output_data/impul_amplitude; % réponse indicielle normalisée pour un état initial nul
 
 pulse_area = sum(COM(:,2)- REF(1,1))/Fs;
-pulse_area
-
-
 
 % %plot
 % figure;
@@ -65,6 +61,7 @@ pulse_area
 % trouvons le temps de départ
 
 find_start = find(COM(:,2) > 1.5+epsilon, 1);
+simulated_output_data = (simulated_output_data-mean(simulated_output_data(find_start-110: find_start-10)))/pulse_area; %réponse indicielle normalisée
 % calcul la valeur initiale de la sortie
 initial_value = mean(simulated_output_data(find_start-110: find_start-10));
 final_value = mean(simulated_output_data(end-100:end));
@@ -109,3 +106,5 @@ plot(simulated_output_time, ones(1, length(simulated_output_time))*(initial_valu
 T = (caracteristic_crossing_time - zero_crossing_time)
 % calcul du délai
 L = zero_crossing_time - find_start/Fs
+% calcul du gain statique
+A0 = final_value % gain statique = valeur finale seulement car réponse indicielle normalisée
