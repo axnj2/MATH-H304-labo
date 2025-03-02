@@ -13,7 +13,7 @@ Fs = 1000;
 pulse_duration = 0.01; % durée de l'impulsion en secondes
 time_after_pulse = 50; % durée après l'impulsion en secondes
 time_before_pulse = 1; % durée avant l'impulsion en secondes
-impul_amplitude = 100; % amplitude de l'impulsion d'entrée;
+impul_amplitude = 200; % amplitude de l'impulsion d'entrée;
 
 %openinout; %Permet l'accès aux ports du calculateur analogique.
 
@@ -45,7 +45,9 @@ OUT = [t; zeros(1, length(t))]';
 REF = 1.5*ones(2,2);
 
 mdl = "simulink/simulink_s1";
-% run simulink model with a Fs Hz sample rate
+% % open the simulink model
+% open_system(mdl);
+% run simulink model with the time vector
 out = sim(mdl, t); %create object
 out;
 out.yout.plot
