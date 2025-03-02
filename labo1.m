@@ -84,25 +84,28 @@ hold on
 max(coefficients(1,:))
 % indice de la valeur maximale de la pente
 index = find(coefficients(1,:) == max(coefficients(1,:)))
-tangent_line = polyval([coefficients(:, index)]', simulated_output_time(find_start:find_start+Fs));
-plot(simulated_output_time(find_start:find_start+Fs), tangent_line, 'r');
+
 
 % find the time where the tangent_line crosses the initial value
 zero_crossing_time = roots([coefficients(:, index)]' - [0, initial_value])
-% find the time where the tangent_line crosses (1-1/e) * final value
-caracteristic_crossing_time = roots([coefficients(:, index)]' - [0,  initial_value + (final_value - initial_value)*(1-1/exp(1))])
+% find the time where the tangent_line crosses the final value
+caracteristic_crossing_time = roots([coefficients(:, index)]' - [0,  final_value])
 % FIXME : it should be when the output_data crosses  (1-1/e) * final value
-% and not the tangent line
+% and not the tangent line crossing the final value, but the should be equal
 
+tangent_line = polyval([coefficients(:, index)]', simulated_output_time(find_start:caracteristic_crossing_time*Fs));
+plot(simulated_output_time(find_start:caracteristic_crossing_time*Fs), tangent_line, 'r');
 
 
 scatter(zero_crossing_time, initial_value, 'r');
-scatter(caracteristic_crossing_time, initial_value + (final_value - initial_value)*(1-1/exp(1)), 'r');
+scatter(caracteristic_crossing_time, final_value, 'r');
+% add a vertical line at the caracteristic_crossing_time
+plot(ones(1, length(simulated_output_time))*caracteristic_crossing_time, simulated_output_data, 'g');
 plot(simulated_output_time, ones(1, length(simulated_output_time))*initial_value, 'g');
 plot(simulated_output_time, ones(1, length(simulated_output_time))*final_value, 'g');
 plot(simulated_output_time, ones(1, length(simulated_output_time))*(initial_value + (final_value - initial_value)*(1-1/exp(1))), 'g');
 
 % calcul de la constante de temps
-T = (caracteristic_crossing_time - zero_crossing_time)/(1-1/exp(1)) 
+T = (caracteristic_crossing_time - zero_crossing_time)
 % calcul du délai
 L = zero_crossing_time - find_start/Fs
