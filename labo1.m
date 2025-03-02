@@ -13,6 +13,7 @@ Fs = 1000;
 pulse_duration = 0.01; % durée de l'impulsion en secondes
 time_after_pulse = 50; % durée après l'impulsion en secondes
 time_before_pulse = 1; % durée avant l'impulsion en secondes
+impul_amplitude = 100; % amplitude de l'impulsion d'entrée;
 
 %openinout; %Permet l'accès aux ports du calculateur analogique.
 
@@ -32,7 +33,7 @@ time_before_pulse = 1; % durée avant l'impulsion en secondes
 %OUT = [time', Data(:,2)]; %(Sortie) Réarrange la structure des données pour leur utilisation dans Simulink.
 
 % Crée une impulsion de 0.25 secondes à 1.5V + 3V = 4,5V à un sample rate de 10000Hz
-impul = 100*ones(1, pulse_duration*Fs);
+impul = impul_amplitude*ones(1, pulse_duration*Fs);
 % ajoute des zeros avant et après l'impulsion 1 second avant et 10 secondes après 
 % (durée totale de 11.25 secondes)
 t = 0:1/Fs:time_before_pulse+pulse_duration + time_after_pulse;
@@ -50,8 +51,7 @@ out;
 out.yout.plot
 simulated_output_time = out.yout.get("simu_output").Values.Time;
 simulated_output_data = out.yout.get("simu_output").Values.Data;
-
-% TODO !! normaliser la réponse indicielle 
+simulated_output_data = simulated_output_data/impul_amplitude; % réponse indicielle normalisée pour un état initial nul
 
 pulse_area = sum(COM(:,2)- REF(1,1))/Fs;
 pulse_area
