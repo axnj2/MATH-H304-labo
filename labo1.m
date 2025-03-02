@@ -11,7 +11,7 @@ epsilon = 0.3; % marge d'erreur pour la détection du début de l'impulsion
 slope_window = 10; % nombre de points pour calculer la coefficients
 Fs = 1000;
 pulse_duration = 0.01; % durée de l'impulsion en secondes
-time_after_pulse = 200; % durée après l'impulsion en secondes
+time_after_pulse = 50; % durée après l'impulsion en secondes
 time_before_pulse = 1; % durée avant l'impulsion en secondes
 
 %openinout; %Permet l'accès aux ports du calculateur analogique.
@@ -91,6 +91,10 @@ plot(simulated_output_time(find_start:find_start+Fs), tangent_line, 'r');
 zero_crossing_time = roots([coefficients(:, index)]' - [0, initial_value])
 % find the time where the tangent_line crosses (1-1/e) * final value
 caracteristic_crossing_time = roots([coefficients(:, index)]' - [0,  initial_value + (final_value - initial_value)*(1-1/exp(1))])
+% FIXME : it should be when the output_data crosses  (1-1/e) * final value
+% and not the tangent line
+
+
 
 scatter(zero_crossing_time, initial_value, 'r');
 scatter(caracteristic_crossing_time, initial_value + (final_value - initial_value)*(1-1/exp(1)), 'r');
@@ -99,6 +103,6 @@ plot(simulated_output_time, ones(1, length(simulated_output_time))*final_value, 
 plot(simulated_output_time, ones(1, length(simulated_output_time))*(initial_value + (final_value - initial_value)*(1-1/exp(1))), 'g');
 
 % calcul de la constante de temps
-T = (caracteristic_crossing_time - zero_crossing_time)/(1-1/exp(1))
+T = (caracteristic_crossing_time - zero_crossing_time)/(1-1/exp(1)) 
 % calcul du délai
 L = zero_crossing_time - find_start/Fs
