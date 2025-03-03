@@ -2,12 +2,12 @@ clear all;
 close all;
 clc;
 
-duration = 20; % durée de l'expérience
-fs = 1000; % fréquence d'échantillonage
+% à chaud valeur de seuil : -0.32
 
-openinout; %Permet l'accès aux ports du calculateur analogique.
-[time, data] = acqui2(fs,duration);
-closeinout %Permet de retirer l'accès aux ports du calculateur analogique.
+duration = 10; % durée de l'expérience
+fs = 10000; % fréquence d'échantillonage
+
+[time, data] = acqui(fs,duration);
 % time est un vecteur colonne de fs*duration lignes
 % data est une matrice de 8 colonnes et fs*duration lignes
 
@@ -16,4 +16,13 @@ output_channel = 2;
 input = data(:, input_channel);
 output = data(:, output_channel);
 
-save("mesure_XXXX.mat", "time", "input", "output");
+input = -input';
+output = output';
+time = time';
+
+size(input)
+
+
+save("mesure_pulse_7.mat", "time", "input", "output");
+
+plot(time, input, time, output);
