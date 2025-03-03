@@ -7,13 +7,17 @@ addpath("simulink"); %Ajoute le répertoire contenant les fichiers
 
 
 % définition des constantes
-epsilon = 0.3; % marge d'erreur pour la détection du début de l'impulsion
-slope_window = 10; % nombre de points pour calculer la coefficients
-Fs = 1000;
+epsilon = 0.01; % marge d'erreur pour la détection du début de l'impulsion
+slope_window = 300; % nombre de points pour calculer les coefficients
+Fs = 10000;
 pulse_duration = 0.01; % durée de l'impulsion en secondes
 time_after_pulse = 50; % durée après l'impulsion en secondes
 time_before_pulse = 1; % durée avant l'impulsion en secondes
 impul_amplitude = 200; % amplitude de l'impulsion d'entrée;
+simu_only = false;
+data_to_load = "mesure_pulse_3.mat";
+
+
 
 %openinout; %Permet l'accès aux ports du calculateur analogique.
 
@@ -32,27 +36,43 @@ impul_amplitude = 200; % amplitude de l'impulsion d'entrée;
 %COM = [time', Data(:,1)]; %(Commande) Réarrange la structure des données pour leur utilisation dans Simulink.
 %OUT = [time', Data(:,2)]; %(Sortie) Réarrange la structure des données pour leur utilisation dans Simulink.
 
-% Crée une impulsion de 0.25 secondes à 1.5V + 3V = 4,5V à un sample rate de 10000Hz
-impul = impul_amplitude*ones(1, pulse_duration*Fs);
-% ajoute des zeros avant et après l'impulsion 1 second avant et 10 secondes après 
-% (durée totale de 11.25 secondes)
-t = 0:1/Fs:time_before_pulse+pulse_duration + time_after_pulse;
-t = t(1:end-1);
+if simu_only 
+    % Crée une impulsion de 0.25 secondes à 1.5V + 3V = 4,5V à un sample rate de 10000Hz
+    impul = impul_amplitude*ones(1, pulse_duration*Fs);
+    % ajoute des zeros avant et après l'impulsion 1 second avant et 10 secondes après 
+    % (durée totale de 11.25 secondes)
+    t = 0:1/Fs:time_before_pulse+pulse_duration + time_after_pulse;
+    t = t(1:end-1);
 
-input = [1.5*ones(1, time_before_pulse*Fs), impul, 1.5*ones(1, time_after_pulse*Fs)];
-COM = [t; input]';
-OUT = [t; zeros(1, length(t))]';
-REF = 1.5*ones(2,2);
+    input = [1.5*ones(1, time_before_pulse*Fs), impul, 1.5*ones(1, time_after_pulse*Fs)];
+    COM = [t; input]';
+    OUT = [t; zeros(1, length(t))]';
+    REF = 1.5*ones(2,2);
+    
+    mdl = "simulink_s1_old_version";
+    % % open the simulink model
+    open_system(mdl);
+    % run simulink model with the time vector
+    out = sim(mdl, t); %create object
+    out;
+    out.yout.plot
+    simulated_output_time = out.yout.get("simu_output").Values.Time;
+    simulated_output_data = out.yout.get("simu_output").Values.Data;
+else
+    load(data_to_load,  "time", "input", "output");
 
-mdl = "simulink/simulink_s1";
-% % open the simulink model
-% open_system(mdl);
-% run simulink model with the time vector
-out = sim(mdl, t); %create object
-out;
-out.yout.plot
-simulated_output_time = out.yout.get("simu_output").Values.Time;
-simulated_output_data = out.yout.get("simu_output").Values.Data;
+    
+    t = time;
+    COM = [t; input]';
+    OUT = [t; output]';
+    
+    REF = mean(input(1:100));
+    simulated_output_time = t';
+    simulated_output_data = output';
+end
+
+
+
 
 pulse_area = sum(COM(:,2)- REF(1,1))/Fs;
 
@@ -62,8 +82,10 @@ pulse_area = sum(COM(:,2)- REF(1,1))/Fs;
 
 % trouvons le temps de départ
 
-find_start = find(COM(:,2) > 1.5+epsilon, 1);
-simulated_output_data = (simulated_output_data-mean(simulated_output_data(find_start-110: find_start-10)))/pulse_area; %réponse indicielle normalisée
+find_start = find(COM(:,2) > REF+epsilon, 1);
+output_ref = mean(simulated_output_data(find_start-110: find_start-10));
+simulated_output_data = (simulated_output_data-output_ref)/pulse_area; %réponse indicielle normalisée
+normalized_input =  (input-REF)/pulse_area;
 % calcul la valeur initiale de la sortie
 initial_value = mean(simulated_output_data(find_start-110: find_start-10));
 final_value = mean(simulated_output_data(end-100:end));
@@ -80,6 +102,7 @@ end
 figure;
 plot(simulated_output_time, coefficients(1,:), simulated_output_time, simulated_output_data);
 hold on
+plot(simulated_output_time, normalized_input)
 max(coefficients(1,:))
 % indice de la valeur maximale de la pente
 index = find(coefficients(1,:) == max(coefficients(1,:)))
@@ -103,6 +126,9 @@ plot(ones(1, length(simulated_output_time))*caracteristic_crossing_time, simulat
 plot(simulated_output_time, ones(1, length(simulated_output_time))*initial_value, 'g');
 plot(simulated_output_time, ones(1, length(simulated_output_time))*final_value, 'g');
 plot(simulated_output_time, ones(1, length(simulated_output_time))*(initial_value + (final_value - initial_value)*(1-1/exp(1))), 'g');
+xlim([0, t(end)]);
+ylim([initial_value - 0.1, final_value + 0.1])
+
 
 % calcul de la constante de temps
 T = (caracteristic_crossing_time - zero_crossing_time)
