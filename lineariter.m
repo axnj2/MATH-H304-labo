@@ -9,11 +9,11 @@ Fs = 10000
 figure
 hold on
 
-data_to_load1 = "mesure_pulse_5.mat";
-plot_data("mesure_pulse_6.mat", "r", Fs)
-plot_data("mesure_pulse_8.mat", "b", Fs)
-plot_data("mesure_pulse_10.mat", "g", Fs)
-plot_data("mesure_pulse_3.mat", "y", Fs)
+data_to_load1 = "data/labo1/mesure_pulse_5.mat";
+plot_data("data/labo1/mesure_pulse_3.mat", "r", Fs)
+% plot_data("data/labo1/mesure_pulse_8.mat", "b", Fs)
+% plot_data("data/labo1/mesure_pulse_10.mat", "g", Fs)
+% plot_data("data/labo1/mesure_pulse_3.mat", "y", Fs)
 legend()
 xlabel("time (s)")
 ylabel("normalized input/output (non unit)")

@@ -9,7 +9,7 @@ Fs = 10000;
 figure
 hold on
 
-load("mesure_integrateur.mat")
+load("data/labo1/mesure_integrateur.mat")
 output = output - mean(output(1:200));
 input = input - mean(input(1:200));
 input = input(15000:40000);

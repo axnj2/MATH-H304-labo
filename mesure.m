@@ -23,6 +23,6 @@ time = time';
 size(input)
 
 
-save("mesure_pulse_7.mat", "time", "input", "output");
+save("data/labo1/mesure_pulse_7.mat", "time", "input", "output");
 
 plot(time, input, time, output);
