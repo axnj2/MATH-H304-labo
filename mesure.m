@@ -5,7 +5,7 @@ clc;
 % à chaud valeur de seuil : -0.32
 
 duration = 10; % durée de l'expérience
-fs = 10000; % fréquence d'échantillonage
+Fs = 10000; % fréquence d'échantillonage
 
 [time, data] = acqui(fs,duration);
 % time est un vecteur colonne de fs*duration lignes
@@ -23,6 +23,6 @@ time = time';
 size(input)
 
 
-save("data/labo1/mesure_pulse_7.mat", "time", "input", "output");
+save("data/labo1/mesure_pulse_7.mat", "time", "input", "output", "Fs");
 
 plot(time, input, time, output);
