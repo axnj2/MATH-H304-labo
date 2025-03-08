@@ -18,7 +18,7 @@ y0 = 0;
 u0 = 0.32;
 
 % gain du régulateur proportionnel
-K = 0.25;
+K = 10;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,7 +27,7 @@ K = 0.25;
 from_real_data = false;
 % type of synthetic input : (only valid  for from_real_data = false)
 step_reference = true;
-perturbation_step = false;
+perturbation_step = true;
 
 step_reference_amplitude = 1;
 
