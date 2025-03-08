@@ -18,7 +18,7 @@ y0 = 0;
 u0 = 0.32;
 
 % gain du régulateur proportionnel
-K = 10;
+K = 0.20;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,7 +27,7 @@ K = 10;
 from_real_data = false;
 % type of synthetic input : (only valid  for from_real_data = false)
 step_reference = true;
-perturbation_step = true;
+perturbation_step = false;
 
 step_reference_amplitude = 1;
 
@@ -84,7 +84,17 @@ real_output_signal = out.yout.getElement(1).Values.Data;
 %%% Calculate the performance criteria
 % static error
 static_error = abs(mean(output_signal(end-N:end)) - mean(reference_signal(end-N:end)))
-% TODO facteur d'amortissement
+overshoot = (max(output_signal) - reference_signal(end))/reference_signal(end)
+% damping ratio 
+% overshoot = exp(-pi*zeta/sqrt(1-zeta^2))
+% -log(overshoot) = pi*zeta/sqrt(1-zeta^2)
+% log(overshoot)^2 = pi^2*zeta^2/(1-zeta^2)
+% log(overshoot)^2*(1-zeta^2) = pi^2*zeta^2
+% log(overshoot)^2 - zeta^2*log(overshoot)^2 = pi^2*zeta^2
+% log(overshoot)^2 = pi^2*zeta^2 + zeta^2*log(overshoot)^2
+% log(overshoot)^2 = zeta^2*(pi^2 + log(overshoot)^2)
+% zeta = sqrt(-log(overshoot)^2/(pi^2 + log(overshoot)^2))
+zeta = sqrt((log(overshoot))^2/(pi^2 + log(overshoot)^2))
 
 %%%%%%%%%%%%% Ploting the results %%%%%%%%%%%%%%%%
 %%% plot the results including:
