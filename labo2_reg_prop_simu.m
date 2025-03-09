@@ -18,7 +18,7 @@ y0 = 0;
 u0 = 0.32;
 
 % gain du régulateur proportionnel
-K = 0.20;
+K = 0.213;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,10 +26,12 @@ K = 0.20;
 
 from_real_data = false;
 % type of synthetic input : (only valid  for from_real_data = false)
-step_reference = true;
-perturbation_step = false;
+step_reference = false;
+perturbation_step = true;
 
-step_reference_amplitude = 1;
+step_reference_amplitude = 3;
+perturbation_step_amplitude = 1;
+
 
 if from_real_data
     data_to_load = "data/labo2/TODO";
@@ -54,7 +56,7 @@ else
 
     % perturbation signal
     if perturbation_step
-        perturbation_step_amplitude = 0.1;
+        % do nothing, keep the value of perturbation_step_amplitude
     else
         perturbation_step_amplitude = 0;
     end
@@ -70,11 +72,11 @@ output = [time, output];
 
 mdl_name = "simulink/simulink_s2_22b_22c_2020a_03.slx";
 % open model
-%open_system(mdl_name);
+open_system(mdl_name);
 
 % run simulink model with the time vector
 out = sim(mdl_name, time); 
-out.yout.plot
+%out.yout.plot
 %%% get the results from the simulation
 commande_signal = out.yout.getElement(3).Values.Data;
 output_signal = out.yout.getElement(4).Values.Data;
