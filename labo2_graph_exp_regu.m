@@ -4,17 +4,17 @@ clc;
 
 normalized = 1;  % 1 = on normalise, 0 = on normalise pas
 data_to_load = "data/labo2/TODO";
-load(data_to_load,  "time", "input", "output", "Fs");
+load(data_to_load,  "time", "input", "output","reference", "Fs");
 
 % on jarte l'offset sur base des 200 premiers points comme d'hab
 N_init = 200;
 baseline_input  = mean(input(1:N_init));
 baseline_output = mean(output(1:N_init));
-% baseline_ref = mean(reference_signal(1:N_init)); % Ant :ref = input non ? c'est quoi ref ?
+baseline_ref = mean(reference(1:N_init)); % Ant :ref = input non ? c'est quoi ref ?
 
 
 % normalise as usual, Ant : du coup tu normalise tout le temps le signal ?
-pulse_area = sum(input_signal - mean(input_signal(1:100))) / Fs;
+pulse_area = sum(input - mean(input(1:100))) / Fs;
 
 % Ant :c'est vraiment nécesaire ? 
 if pulse_area > 5  % je met un max de 5 mais je me rappelle plus des values du vrai
@@ -22,13 +22,13 @@ if pulse_area > 5  % je met un max de 5 mais je me rappelle plus des values du v
 end
 
 if normalized == 1  % Si on veut normaliser
-    input_norm  = (input_signal - mean(input_signal(1:100))) / pulse_area;
-    output_norm = (output_signal - mean(output_signal(1:100))) / pulse_area;
-    reference_norm = (reference_signal - mean(reference_signal(1:100))) / pulse_area;
+    input_norm  = (input - mean(input(1:100))) / pulse_area;
+    output_norm = (output - mean(output(1:100))) / pulse_area;
+    reference_norm = (reference - mean(reference(1:100))) / pulse_area;
 else
-    input_norm  = input_signal;
-    output_norm = output_signal;
-    reference_norm = reference_signal;
+    input_norm  = input;
+    output_norm = output;
+    reference_norm = reference;
 end
 
 
