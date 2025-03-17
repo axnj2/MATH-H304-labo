@@ -14,6 +14,7 @@ reference = reference(1:80000);
 time = time(1:80000);
 
 plot(time, output, time, input, time, reference)
+grid on
 legend("Sortie y(t)", "Consigne r(t)","Commande u(t)")
 xlim([0, 5])
 ylim([0.2, 2.3])
