@@ -15,22 +15,23 @@ T = 0.4484;
 
 % points de fonctionnement
 y0 = 0;
-u0 = 0.32;
+u0 = 0;
 
 % gain du régulateur proportionnel
-K = 0.224;
+target_zeta = 0.7;
+K = 1/(4*A0*T*target_zeta^2)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % input signals :
 
-from_real_data = true;
+from_real_data = false;
 % type of synthetic input : (only valid  for from_real_data = false)
-step_reference = true;
-perturbation_step = false;
+step_reference = false;
+perturbation_step = true;
 
 step_reference_amplitude = 1;
-perturbation_step_amplitude = 1;
+perturbation_step_amplitude = 0.1;
 
 
 if from_real_data
@@ -49,7 +50,7 @@ if from_real_data
     
 else
     Fs = 10000;
-    duration = 30;
+    duration = 15;
     % time vector
     time = 0:1/Fs:duration;
     time = time';
@@ -80,7 +81,7 @@ input = [time, input];
 
 mdl_name = "simulink/simulink_s2_22b_22c_2020a_03.slx";
 % open model
-open_system(mdl_name);
+% open_system(mdl_name);
 
 % run simulink model with the time vector
 out = sim(mdl_name, time);
@@ -89,6 +90,7 @@ out = sim(mdl_name, time);
 commande_signal = out.yout.getElement(2).Values.Data;
 output_signal = out.yout.getElement(3).Values.Data;
 reference_signal = out.yout.getElement(1).Values.Data;
+perturbation_signal = out.yout.getElement(5).Values.Data;
 
 %%% Calculate the performance criteria
 % static error
@@ -113,13 +115,24 @@ zeta = sqrt((log(overshoot))^2/(pi^2 + log(overshoot)^2))
 
 figure;
 hold on;
-plot(time, commande_signal, 'DisplayName', 'commande u(t)', 'LineWidth', 3 );
-plot(time, output_signal, 'DisplayName', 'sortie y(t)', 'LineWidth', 2 );
+line_width = 1;
+if from_real_data
+    line_width = 2;
+end
+
+plot(time, commande_signal, 'DisplayName', 'commande u(t)', 'LineWidth', line_width );
+plot(time, output_signal, 'DisplayName', 'sortie y(t)', 'LineWidth', line_width );
 plot(time, reference_signal, 'DisplayName', 'consigne r(t)');
+
+if perturbation_step_amplitude ~= 0
+    plot(time, perturbation_signal, 'DisplayName', 'perturbation');
+    relative_static_error = abs(static_error)/abs(perturbation_step_amplitude) 
+end
 if from_real_data
     plot(time, output, 'DisplayName', 'sortie réelle y(t)', 'LineWidth', 0.01);
     plot(time, real_command, 'DisplayName', 'commande réelle u(t)', 'LineWidth', 0.01);
 end
+
 hold off;
 legend;
 xlabel('temps (s)');
