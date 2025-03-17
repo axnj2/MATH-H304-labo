@@ -124,7 +124,7 @@ plot(time, commande_signal, 'DisplayName', 'commande u(t)', 'LineWidth', line_wi
 plot(time, output_signal, 'DisplayName', 'sortie y(t)', 'LineWidth', line_width );
 plot(time, reference_signal, 'DisplayName', 'consigne r(t)');
 
-if perturbation_step_amplitude ~= 0
+if perturbation_step
     plot(time, perturbation_signal, 'DisplayName', 'perturbation');
     relative_static_error = abs(static_error)/abs(perturbation_step_amplitude) 
 end
