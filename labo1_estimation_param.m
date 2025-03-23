@@ -7,7 +7,7 @@ addpath("simulink"); %Ajoute le répertoire contenant les fichiers
 
 
 % définition des constantes
-epsilon = 0.01; % marge d'erreur pour la détection du début de l'impulsion
+epsilon = 0.2; % marge d'erreur pour la détection du début de l'impulsion
 slope_window = 300; % nombre de points pour calculer les coefficients
 Fs = 10000;
 pulse_duration = 0.01; % durée de l'impulsion en secondes
@@ -15,7 +15,7 @@ time_after_pulse = 50; % durée après l'impulsion en secondes
 time_before_pulse = 1; % durée avant l'impulsion en secondes
 impul_amplitude = 200; % amplitude de l'impulsion d'entrée;
 simu_only = false;
-data_to_load = "data/labo1/mesure_pulse_3.mat";
+data_to_load = "data/labo1/mesure_pulse_5.mat";
 
 
 
@@ -127,7 +127,7 @@ plot(ones(1, length(simulated_output_time))*caracteristic_crossing_time, simulat
 plot(simulated_output_time, ones(1, length(simulated_output_time))*initial_value, 'g');
 plot(simulated_output_time, ones(1, length(simulated_output_time))*final_value, 'g');
 plot(simulated_output_time, ones(1, length(simulated_output_time))*(initial_value + (final_value - initial_value)*(1-1/exp(1))), 'g');
-xlim([3.2, 6.5]);
+xlim([find_start/Fs - 0.3, (find_start/Fs+2)]);
 ylim([-1, final_value+1]);
 xlabel("time (s)")
 ylabel("normalized input/output (non unit)")
