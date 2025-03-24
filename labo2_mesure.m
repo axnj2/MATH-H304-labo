@@ -20,5 +20,6 @@ output = output_signal';
 reference = reference_signal';
 time          = time';
 
-save("data/labo2/mesure_regu_1.mat", "time", "input", "output", "reference", "Fs"); 
+save("data/labo3/mesure_regu_1_K_4_2.mat", "time", "input", "output", "reference", "Fs"); 
 
+plot(time, input, time, output, time, reference)
