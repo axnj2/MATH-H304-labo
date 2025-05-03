@@ -10,11 +10,11 @@ Tsys = 0.45;   %Constante de temps
 H = tf([A0], [Tsys 1 0]);
 
 % fonction de transfert du régulateur
-kp = 5; 
-kd = 1.5;
+kp = 0.8; 
+kd = 1.2;
 T_filtrage = kd/(kp*10); %Constante de temps du filtre
 
-D = tf([kd kp], [T_filtrage 1]);
+D = tf(kp) + tf([kd 0], [T_filtrage 1]);
 
 % fonction de transfert du filtre anti-repli
 zeta = 0.7;   %Facteur d'amortissement
