@@ -2,8 +2,8 @@ clc; clear all; close all;
 
 
 
-kp_values = 0.3:0.4:10;
-kd_values = 0.3:0.4:2;
+kp_values = 5:0.1:7;
+kd_values = 0.5:0.02:0.7;
 % print number of evaluations :
 number_of_evaluations = length(kp_values) * length(kd_values);
 fprintf('Number of evaluations: %d\n', number_of_evaluations);
