@@ -10,10 +10,11 @@ Tsys = 0.45;   %Constante de temps
 H = tf([A0], [Tsys 1 0]);
 
 % fonction de transfert du régulateur
-kp = 0.22; 
-kd = 0.0;
+kp = 5; 
+kd = 1.5;
+T_filtrage = kd/(kp*10); %Constante de temps du filtre
 
-D = tf([kd kp], [1]);
+D = tf([kd kp], [T_filtrage 1]);
 
 % fonction de transfert du filtre anti-repli
 zeta = 0.7;   %Facteur d'amortissement
@@ -34,8 +35,6 @@ H.InputDelay = Ts;
 forward_path = series(D,H)
 Transfert_function = feedback(forward_path,F)
 
-bode(Transfert_function)
-grid on
 
 figure
 step(Transfert_function)
@@ -67,9 +66,6 @@ figure
 nyquist(Transfert_function)
 grid on
 
-figure
-rlocus(pade(H))
-grid on
 
 % plot the control signal during the step response
 figure
@@ -125,7 +121,7 @@ if any(below_max_amplitude)
     % Highlight regions below min amplitude
     for i = 1:length(transitions_to_below)
         plot(t(transitions_to_below(i):transitions_from_below(i)), ...
-             u(transitions_to_below(i):transitions_from_below(i)), 'b', 'LineWidth', 2);
+             u(transitions_to_below(i):transitions_from_below(i)), 'r', 'LineWidth', 2);
     end
     
     fprintf('Signal exceeds lower limit in %d intervals for a total of %.4f seconds\n', ...
