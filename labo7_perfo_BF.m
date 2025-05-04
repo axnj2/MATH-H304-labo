@@ -32,8 +32,9 @@ H.InputDelay = Ts;
 
 
 % fonction de transfert du système bouclé
-forward_path = series(D,H)
-Transfert_function = feedback(forward_path,F)
+forward_path = series(D,H);
+Transfert_function = feedback(forward_path,F);
+open_loop = series(forward_path, F);
 
 
 figure
@@ -42,8 +43,8 @@ grid on
 
 % show the gain and phase margin
 figure
-margin(Transfert_function,{10^-2,10^2} );
-[Gm, Pm, Wcg, Wcp] = margin(Transfert_function);
+margin(open_loop,{10^-2,10^2} );
+[Gm, Pm, Wcg, Wcp] = margin(open_loop);
 disp('Gain margin (dB):');
 disp(20*log10(Gm));
 disp('Phase margin (degrees):');
@@ -63,7 +64,7 @@ disp('Rise time (s):');
 disp(risetime);
 
 figure
-nyquist(Transfert_function)
+nyquist(open_loop)
 grid on
 
 

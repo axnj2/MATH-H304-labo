@@ -106,46 +106,53 @@ function [Gm, Pm, risetime, share_time_saturated] = performance(kp, kd)
     % fonction de transfert du système bouclé
     forward_path = series(D,H);
     Transfert_function = feedback(forward_path,F);
-
-    [Gm, Pm, temp, temp1] = margin(Transfert_function);
-
-    % show the overshoot and settling time
-    [y, t] = step(Transfert_function);
-    risetime = t(find(y >= 0.95, 1)) - t(find(y >= 0.05, 1));
+    open_loop = series(forward_path, F);
 
 
-    % Transfer function from reference to control signal
-    Control_TF = feedback(D, series(H, F));
+    [Gm, Pm, ~, ~] = margin(open_loop);
+    if Gm < 0 || Pm < 0
+        risetime = inf;
+        share_time_saturated = inf;
+        return;
+    else 
+        % show the overshoot and settling time
+        [y, t] = step(Transfert_function);
+        risetime = t(find(y >= 0.95, 1)) - t(find(y >= 0.05, 1));
 
-    % Simulate step response
-    [u, t] = step(Control_TF);
-    % evaluate the time during which the control signal is above the max amplitude
-    above_max_amplitude = u > max_amplitude;
-    below_max_amplitude = u < -max_amplitude;
 
-    % Find intervals where signal exceeds upper limit
-    if any(above_max_amplitude)
-        transitions_to_above = find(diff([0; above_max_amplitude]) == 1);
-        transitions_from_above = find(diff([above_max_amplitude; 0]) == -1);
-        
-        time_above = sum(t(transitions_from_above) - t(transitions_to_above));
-    else
-        time_above = 0;
+        % Transfer function from reference to control signal
+        Control_TF = feedback(D, series(H, F));
+
+        % Simulate step response
+        [u, t] = step(Control_TF);
+        % evaluate the time during which the control signal is above the max amplitude
+        above_max_amplitude = u > max_amplitude;
+        below_max_amplitude = u < -max_amplitude;
+
+        % Find intervals where signal exceeds upper limit
+        if any(above_max_amplitude)
+            transitions_to_above = find(diff([0; above_max_amplitude]) == 1);
+            transitions_from_above = find(diff([above_max_amplitude; 0]) == -1);
+            
+            time_above = sum(t(transitions_from_above) - t(transitions_to_above));
+        else
+            time_above = 0;
+        end
+
+        % Find intervals where signal exceeds lower limit
+        if any(below_max_amplitude)
+            transitions_to_below = find(diff([0; below_max_amplitude]) == 1);
+            transitions_from_below = find(diff([below_max_amplitude; 0]) == -1);
+            
+            time_below = sum(t(transitions_from_below) - t(transitions_to_below));
+        else
+            time_below = 0;
+        end
+
+
+        % Total time outside limits
+        total_time_outside = time_above + time_below;
+        share_time_saturated = 100*total_time_outside/t(end);
     end
-
-    % Find intervals where signal exceeds lower limit
-    if any(below_max_amplitude)
-        transitions_to_below = find(diff([0; below_max_amplitude]) == 1);
-        transitions_from_below = find(diff([below_max_amplitude; 0]) == -1);
-        
-        time_below = sum(t(transitions_from_below) - t(transitions_to_below));
-    else
-        time_below = 0;
-    end
-
-
-    % Total time outside limits
-    total_time_outside = time_above + time_below;
-    share_time_saturated = 100*total_time_outside/t(end);
 end
 
