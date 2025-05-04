@@ -2,8 +2,8 @@ clc; clear all; close all;
 
 
 
-kp_values = 5:0.1:7;
-kd_values = 0.5:0.02:0.7;
+kp_values = 0.1:0.3:7;
+kd_values = 0.1:0.3:7;
 % print number of evaluations :
 number_of_evaluations = length(kp_values) * length(kd_values);
 fprintf('Number of evaluations: %d\n', number_of_evaluations);
@@ -60,8 +60,13 @@ winthin_specs =  share_time_saturated_values < 5 & Pm_values > 30 & Gm_values > 
 figure;
 % Create grid coordinates for scatter3
 [KP, KD] = ndgrid(kp_values, kd_values);
-scatter3(KP(:), KD(:), risetime_values(:), 50, winthin_specs(:), 'filled');
+% Create color array: red for specs not met, dark green for specs met
+colors = zeros(numel(winthin_specs), 3);  % Initialize RGB color array
+colors(~winthin_specs(:), :) = repmat([1 0 0], sum(~winthin_specs(:)), 1);  % Red for not met
+colors(winthin_specs(:), :) = repmat([0 0.5 0], sum(winthin_specs(:)), 1);  % Dark green for met
 
+scatter3(KP(:), KD(:), risetime_values(:), 50, colors, 'filled');
+zlim([0,0.20]);
 xlabel('kp');
 ylabel('kd');
 zlabel('Rise Time (s)');
