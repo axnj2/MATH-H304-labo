@@ -1,9 +1,10 @@
 clear all; close all; clc;
 
-kp = 5;                         
-w_n =  0.01;
-zeta = 0.7;
-G = tf((w_n^2), [1 2*zeta*w_n (w_n^2)]);      % Système réglé 
+kp = 0.22;                         
+w_n =  100;
+A0 = 5.35;
+T = 0.45;
+G = tf(A0, [T 1 0]);      % Système réglé 
 
 % Régulateur analogique 
 L_cont = kp * G;
@@ -31,13 +32,6 @@ title('Comparaison des courbes de Bode - Boucles ouvertes');
 grid on;
 
 
-[Gm_cont, Pm_cont, Wcg_cont, Wcp_cont] = margin(L_cont);
-[Gm1, Pm1, Wcg1, Wcp1] = margin(L_num1);
-[Gm2, Pm2, Wcg2, Wcp2] = margin(L_num2);
-
-% on s'en fout de Wcg et Wcp, ce qu'on veut c'est marge de gain et marge de
-% phase donc Gm et Pm
-
-fprintf('Régulateur continu      : marge de gain = %.2f dB, marge de phase = %.2f°\n', 20*log10(Gm_cont), Pm_cont);
-fprintf('Régulation numérique fs1: marge de gain = %.2f dB, marge de phase = %.2f°\n', 20*log10(Gm1), Pm1);
-fprintf('Régulation numérique fs2: marge de gain = %.2f dB, marge de phase = %.2f°\n', 20*log10(Gm2), Pm2);
+margin(L_cont);
+margin(L_num1);
+margin(L_num2);
