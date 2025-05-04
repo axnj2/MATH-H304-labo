@@ -10,8 +10,8 @@ Tsys = 0.45;   %Constante de temps
 H = tf([A0], [Tsys 1 0]);
 
 % fonction de transfert du régulateur
-kp = 6.6; 
-kd = 0.6;
+kp = 0.69; 
+kd = 0.58;
 T_filtrage = kd/(kp*10); %Constante de temps du filtre
 
 D = tf(kp) + tf([kd 0], [T_filtrage 1]);

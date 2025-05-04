@@ -2,8 +2,8 @@ clc; clear all; close all;
 
 
 
-kp_values = 0.1:0.3:7;
-kd_values = 0.1:0.3:7;
+kp_values = 0.3:0.01:0.8;
+kd_values = 0.3:0.01:0.9;
 % print number of evaluations :
 number_of_evaluations = length(kp_values) * length(kd_values);
 fprintf('Number of evaluations: %d\n', number_of_evaluations);
@@ -12,16 +12,18 @@ Gm_values = zeros(length(kp_values), length(kd_values));
 Pm_values = zeros(length(kp_values), length(kd_values));
 risetime_values = zeros(length(kp_values), length(kd_values));
 share_time_saturated_values = zeros(length(kp_values), length(kd_values));
+max_signal_reglant_to_max_value_ratio_values = zeros(length(kp_values), length(kd_values));
 for i = 1:length(kp_values)
     for j = 1:length(kd_values)
         % Calculate performance metrics
-        [Gm, Pm, risetime, share_time_saturated] = performance(kp_values(i), kd_values(j));
+        [Gm, Pm, risetime, share_time_saturated, max_signal_reglant_to_max_value_ratio] = performance(kp_values(i), kd_values(j));
         
         % Store the results
         Gm_values(i,j) = Gm;
         Pm_values(i,j) = Pm;
         risetime_values(i,j) = risetime;
         share_time_saturated_values(i,j) = share_time_saturated;
+        max_signal_reglant_to_max_value_ratio_values(i,j) = max_signal_reglant_to_max_value_ratio;
     end
 end
 % Plot the results
@@ -56,7 +58,7 @@ title('Saturation Time');
 grid on;
 
 % plot only the rise time and color the surface if it is winthin the specs
-winthin_specs =  share_time_saturated_values < 5 & Pm_values > 30 & Gm_values > 6;
+winthin_specs =  share_time_saturated_values < 5 & Pm_values > 30 & Gm_values > 6 & max_signal_reglant_to_max_value_ratio_values < 2;
 figure;
 % Create grid coordinates for scatter3
 [KP, KD] = ndgrid(kp_values, kd_values);
@@ -66,7 +68,7 @@ colors(~winthin_specs(:), :) = repmat([1 0 0], sum(~winthin_specs(:)), 1);  % Re
 colors(winthin_specs(:), :) = repmat([0 0.5 0], sum(winthin_specs(:)), 1);  % Dark green for met
 
 scatter3(KP(:), KD(:), risetime_values(:), 50, colors, 'filled');
-zlim([0,0.20]);
+zlim([0,1]);
 xlabel('kp');
 ylabel('kd');
 zlabel('Rise Time (s)');
@@ -74,7 +76,7 @@ title('Rise Time with Specs');
 
 
 
-function [Gm, Pm, risetime, share_time_saturated] = performance(kp, kd)
+function [Gm, Pm, risetime, share_time_saturated, max_signal_reglant_to_max_value_ratio] = performance(kp, kd)
     % maximum linear amplitude
     max_amplitude = 4.5-0.32;
 
@@ -113,6 +115,7 @@ function [Gm, Pm, risetime, share_time_saturated] = performance(kp, kd)
     if Gm < 0 || Pm < 0
         risetime = inf;
         share_time_saturated = inf;
+        max_signal_reglant_to_max_value_ratio = inf;
         return;
     else 
         % show the overshoot and settling time
@@ -153,6 +156,12 @@ function [Gm, Pm, risetime, share_time_saturated] = performance(kp, kd)
         % Total time outside limits
         total_time_outside = time_above + time_below;
         share_time_saturated = 100*total_time_outside/t(end);
+
+        max_signal_reglant_to_max_value_ratio = max(abs(u))/max_amplitude;
+    end
+
+    if size(risetime) == [0, 1]
+        risetime = inf;
     end
 end
 
