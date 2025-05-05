@@ -2,9 +2,11 @@ clear all; close all; clc;
 
 kp = 0.22;                         
 w_n =  100;
+zeta = 0.7;
 A0 = 5.35;
 T = 0.45;
 G = tf(A0, [T 1 0]);      % Système réglé 
+F = tf((w_n^2), [1 2*zeta*w_n (w_n^2)]);   % Filtre anti-repli
 
 % Régulateur analogique 
 L_cont = kp * G;
@@ -20,8 +22,8 @@ delay1 = tf(1,1,'InputDelay', Ts1);
 delay2 = tf(1,1,'InputDelay', Ts2);
 
 % Boucles ouvertes avec régulation numérique approximée
-L_num1 = kp * G * delay1;
-L_num2 = kp * G * delay2;
+L_num1 = kp * G * delay1 * F;
+L_num2 = kp * G * delay2 * F;
 
 figure;
 bode(L_cont, 'b', L_num1, 'r--', L_num2, 'g-.');
@@ -31,7 +33,8 @@ legend('Régulateur continu', ...
 title('Comparaison des courbes de Bode - Boucles ouvertes');
 grid on;
 
-
-margin(L_cont);
-margin(L_num1);
-margin(L_num2);
+margin(L_cont, {1e-1, 1e2});
+figure
+margin(L_num1, {1e-1, 1e2});
+figure
+margin(L_num2, {1e-1, 1e2});
