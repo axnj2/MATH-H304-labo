@@ -1,3 +1,4 @@
+clc; clear all;  close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Automatique : Code de mise en oeuvre du régulateur numérique en temps réel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -8,16 +9,25 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 openinout; %Open the ports of the analog computer.
-Ts=;%Set the sampling time.
-lengthExp=; %Set the length of the experiment (in seconds).
+Ts=0.005;%Set the sampling time.
+lengthExp=10; %Set the length of the experiment (in seconds).
 N0=lengthExp/Ts; %Compute the number of points to save the datas.
 Data=zeros(N0,1); %Vector saving the datas. If there are several datas to save, change "1" to the number of outputs.
 DataCommands=ones(N0,1); %Vector storing the input sent to the plant.
+errordata = zeros(N0,1);
+refdata = ones(N0,1);
+realcommand = zeros(N0,1);
 cond=1; %Set the condition variable to 1.
-i=1; %Set the counter to 1.
+i=2; %Set the counter to 1.
 tic %Begins the first strike of the clock.
 time=0:Ts:(N0-1)*Ts; %Vector saving the time steps.
 
+u0 = 0.32;
+kp = 0.2;
+kd = 0.05;
+T_f = kd/(kp*10);
+commande = 5;
+refdata = refdata*commande;
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Loop
@@ -28,16 +38,18 @@ while cond==1
     [in1,in2,in3,in4,in5,in6,in7,in8]=anain; %Acquisition of the measurements. Change the variable names to meaningful ones.
 
     %%%%%%%%%%%%%%%%%% Put your control law here
-
-
-
+    output_sys = in1;
     %%%%%%%%%%%%%%%%%%
+    erreur = (commande-output_sys);
 
-    input=; %Input of the system. 
+    input = -(Ts - 2*T_f)/(Ts + 2*T_f)*DataCommands(i-1) + (kp*(Ts + 2*T_f) + 2*kd)/(Ts + 2*T_f)*erreur + (kp*(Ts - 2*T_f) - 2*kd)/(Ts + 2*T_f)*errordata(i-1);
+    input = -input;
     anaout(input,0); %Command to send the input to the analog computer.
 
     Data(i,1)=in1; %Save one of the measurements (in1).
     DataCommands(i) = input; %Save the input send to the system/
+    errordata(i) = erreur;
+    realcommand(i)=in2;
 
     t=toc; %Second strike of the clock.
 
@@ -63,4 +75,5 @@ end
 closeinout %Close the ports.
 
 figure %Open a new window for plot.
-plot(time,Data(:,1),time,DataCommands(:)); %Plot the experiment (input and output).
+plot(time,Data(:,1),time,DataCommands(:), time, realcommand, time, refdata, time, errordata); %Plot the experiment (input and output).
+legend("signal réglé", "commande", "commande réelle", "référence", "erreur")
