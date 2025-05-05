@@ -33,8 +33,10 @@ legend('Régulateur continu', ...
 title('Comparaison des courbes de Bode - Boucles ouvertes');
 grid on;
 
+figure
 margin(L_cont, {1e-1, 1e2});
 figure
 margin(L_num1, {1e-1, 1e2});
 figure
 margin(L_num2, {1e-1, 1e2});
+ylim([-360, 0])
