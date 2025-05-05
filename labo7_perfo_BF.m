@@ -143,4 +143,8 @@ fprintf('Total time outside amplitude limits: %.4f seconds (%.2f%% of simulation
 D_num = c2d(D, Ts, 'tustin');
 D_num
 
+z = tf('z', Ts);
+D_num_2 = kp + 2*kd*(z-1)/(2*T_filtrage*(z-1) + Ts*(z+1))
+
+iztrans(D_num_2, z)
 
