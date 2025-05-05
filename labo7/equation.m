@@ -26,3 +26,6 @@ for k = 2:N
 end
 
 u(k) = -(T_e - 2*T_s)/(T_e + 2*T_s)*u(k-1) + (k_p*(T_e + 2*T_s) + 2*k_d)/(T_e + 2*T_s)*e(k) + (k_p*(T_e - 2*T_s) - 2*k_d)/(T_e + 2*T_s)*e(k-1);
+
+u(k) = -(Ts - 2*T_f)/(Ts + 2*T_f)*u(k-1) + (kp*(Ts + 2*T_f) + 2*kd)/(Ts + 2*T_f)*e(k) + (kp*(Ts - 2*T_f) - 2*kd)/(Ts + 2*T_f)*e(k-1);
+
