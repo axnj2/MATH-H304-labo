@@ -24,3 +24,5 @@ e = zeros(1, N);     % vecteur de l'erreur e(k)
 for k = 2:N
     u(k) = -alpha * u(k-1) + beta0 * e(k) + beta1 * e(k-1);
 end
+
+u(k) = -(T_e - 2*T_s)/(T_e + 2*T_s)*u(k-1) + (k_p*(T_e + 2*T_s) + 2*k_d)/(T_e + 2*T_s)*e(k) + (k_p*(T_e - 2*T_s) - 2*k_d)/(T_e + 2*T_s)*e(k-1);
