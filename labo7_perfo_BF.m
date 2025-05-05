@@ -138,3 +138,9 @@ fprintf('Total time outside amplitude limits: %.4f seconds (%.2f%% of simulation
     total_time_outside, 100*total_time_outside/t(end));
 
 
+% convert to digital model
+% discretize the regulator
+D_num = c2d(D, Ts, 'tustin');
+D_num
+
+
